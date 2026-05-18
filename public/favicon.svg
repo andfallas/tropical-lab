@@ -1,4 +1,10 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
-  <rect width="32" height="32" fill="#0D0E0A"/>
-  <path d="M16 5 L25 16 L16 27 L7 16 Z" stroke="#B8926A" stroke-width="1.2" fill="none"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60">
+  <rect width="60" height="60" fill="#CB7602"/>
+  <g transform="translate(20, 12)" stroke="#FDFAF6" stroke-miterlimit="10" stroke-width="5" fill="none">
+    <line x1="10" y1="35.94" x2="10" y2="10.94"/>
+    <line x1="10" y1="33.45" x2="20" y2="33.45"/>
+    <line x1="0"  y1="10.94" x2="20" y2="10.94"/>
+    <line x1="10" y1="8.84"  x2="17.07" y2="1.77"/>
+    <line x1="10" y1="8.84"  x2="2.93"  y2="1.77"/>
+  </g>
 </svg>
