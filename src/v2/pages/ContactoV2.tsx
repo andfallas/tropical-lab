@@ -107,9 +107,32 @@ export default function ContactoV2() {
         <motion.div variants={stagger(0.12)} initial="hidden" whileInView="show" viewport={vp}>
           <motion.p variants={slideLeft} style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.16em', textTransform: 'uppercase', color: accent, marginBottom: 32 }}>/ DATOS DE CONTACTO</motion.p>
           {[
-            { icon: '📞', label: 'Teléfono', value: '+506 0000-0000' },
-            { icon: '✉', label: 'Email', value: 'hola@tropicallab.cr' },
-            { icon: '📍', label: 'Dirección', value: 'San José, Costa Rica' },
+            {
+              icon: (
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.57 3.4 2 2 0 0 1 3.54 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.5a16 16 0 0 0 6 6l.88-.88a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
+                </svg>
+              ),
+              label: 'Teléfono', value: '+506 0000-0000',
+            },
+            {
+              icon: (
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                  <rect width="20" height="16" x="2" y="4" rx="2"/>
+                  <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+                </svg>
+              ),
+              label: 'Email', value: 'hola@tropicallab.cr',
+            },
+            {
+              icon: (
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
+                  <circle cx="12" cy="10" r="3"/>
+                </svg>
+              ),
+              label: 'Dirección', value: 'San José, Costa Rica',
+            },
           ].map(d => (
             <motion.div key={d.label} variants={fadeUp}
               whileHover={{ x: 4, transition: { duration: 0.2 } }}
@@ -117,7 +140,7 @@ export default function ContactoV2() {
             >
               <motion.div
                 whileHover={{ scale: 1.1, borderColor: accent }}
-                style={{ width: 40, height: 40, borderRadius: '50%', border: '1px solid rgba(255,255,255,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 16 }}
+                style={{ width: 40, height: 40, borderRadius: '50%', border: '1px solid rgba(255,255,255,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}
               >
                 {d.icon}
               </motion.div>
