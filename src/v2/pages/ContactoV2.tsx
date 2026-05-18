@@ -2,6 +2,7 @@ import { useState, FormEvent, useRef } from 'react'
 import { motion, useScroll, useTransform } from 'framer-motion'
 import NavbarV2 from '@/v2/components/NavbarV2'
 import FooterV2 from '@/v2/components/FooterV2'
+import { useIsMobile } from '@/hooks/useIsMobile'
 import raizImg from '@/assets/images/port-cover-raiz.webp'
 
 const bg = '#101010'
@@ -11,15 +12,15 @@ const grayLight = '#999999'
 
 const fadeUp = {
   hidden: { opacity: 0, y: 40 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] } },
+  show: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] as const } },
 }
 const slideLeft = {
   hidden: { opacity: 0, x: -48 },
-  show: { opacity: 1, x: 0, transition: { duration: 0.75, ease: [0.22, 1, 0.36, 1] } },
+  show: { opacity: 1, x: 0, transition: { duration: 0.75, ease: [0.22, 1, 0.36, 1] as const } },
 }
 const slideRight = {
   hidden: { opacity: 0, x: 48 },
-  show: { opacity: 1, x: 0, transition: { duration: 0.75, ease: [0.22, 1, 0.36, 1] } },
+  show: { opacity: 1, x: 0, transition: { duration: 0.75, ease: [0.22, 1, 0.36, 1] as const } },
 }
 const stagger = (delay = 0.1) => ({
   hidden: {},
@@ -46,6 +47,7 @@ export default function ContactoV2() {
   const [focused, setFocused] = useState<string | null>(null)
   const [sent, setSent] = useState(false)
   const [form, setForm] = useState({ nombre: '', empresa: '', email: '', telefono: '', mensaje: '' })
+  const isMobile = useIsMobile()
 
   const heroRef = useRef<HTMLElement>(null)
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ['start start', 'end start'] })
@@ -84,7 +86,7 @@ export default function ContactoV2() {
         <motion.div
           initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
-          style={{ position: 'relative', zIndex: 1, textAlign: 'center' }}
+          style={{ position: 'relative', zIndex: 1, textAlign: 'center', padding: '0 24px' }}
         >
           <motion.p
             initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
@@ -93,14 +95,14 @@ export default function ContactoV2() {
           >
             Hablemos
           </motion.p>
-          <h1 style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: 'clamp(48px, 8vw, 80px)', letterSpacing: '0.05em', color: '#fff' }}>
+          <h1 style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: isMobile ? 48 : 'clamp(48px, 8vw, 80px)', letterSpacing: '0.05em', color: '#fff' }}>
             CONTÁCTENOS
           </h1>
         </motion.div>
       </section>
 
       {/* Content */}
-      <section style={{ padding: '80px 48px 120px', maxWidth: 1100, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1.4fr', gap: 80 }}>
+      <section style={{ padding: isMobile ? '48px 24px 80px' : '80px 48px 120px', maxWidth: 1100, margin: '0 auto', display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1.4fr', gap: isMobile ? 48 : 80 }}>
         {/* Info */}
         <motion.div variants={stagger(0.12)} initial="hidden" whileInView="show" viewport={vp}>
           <motion.p variants={slideLeft} style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.16em', textTransform: 'uppercase', color: accent, marginBottom: 32 }}>/ DATOS DE CONTACTO</motion.p>
@@ -108,14 +110,14 @@ export default function ContactoV2() {
             { icon: '📞', label: 'Teléfono', value: '+506 0000-0000' },
             { icon: '✉', label: 'Email', value: 'hola@tropicallab.cr' },
             { icon: '📍', label: 'Dirección', value: 'San José, Costa Rica' },
-          ].map((d, i) => (
+          ].map(d => (
             <motion.div key={d.label} variants={fadeUp}
               whileHover={{ x: 4, transition: { duration: 0.2 } }}
               style={{ display: 'flex', gap: 16, marginBottom: 28, alignItems: 'flex-start' }}
             >
               <motion.div
                 whileHover={{ scale: 1.1, borderColor: accent }}
-                style={{ width: 40, height: 40, borderRadius: '50%', border: `1px solid rgba(255,255,255,0.15)`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 16 }}
+                style={{ width: 40, height: 40, borderRadius: '50%', border: '1px solid rgba(255,255,255,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 16 }}
               >
                 {d.icon}
               </motion.div>
@@ -126,7 +128,7 @@ export default function ContactoV2() {
             </motion.div>
           ))}
 
-          <motion.div variants={fadeUp} style={{ marginTop: 48, paddingTop: 32, borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+          <motion.div variants={fadeUp} style={{ marginTop: 40, paddingTop: 28, borderTop: '1px solid rgba(255,255,255,0.08)' }}>
             <p style={{ fontSize: 12, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: grayLight, marginBottom: 16 }}>Redes sociales</p>
             <div style={{ display: 'flex', gap: 12 }}>
               {['F', 'IG', 'X'].map(s => (

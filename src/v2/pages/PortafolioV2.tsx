@@ -3,6 +3,7 @@ import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion'
 import NavbarV2 from '@/v2/components/NavbarV2'
 import FooterV2 from '@/v2/components/FooterV2'
 import { Link } from 'react-router-dom'
+import { useIsMobile } from '@/hooks/useIsMobile'
 import amanecerImg from '@/assets/images/port-cover-amanecer.webp'
 import amanecer2 from '@/assets/images/gallery-amanecer-2.webp'
 import amanecer3 from '@/assets/images/gallery-amanecer-3.webp'
@@ -20,7 +21,7 @@ const gray = '#626262'
 
 const fadeUp = {
   hidden: { opacity: 0, y: 40 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] } },
+  show: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] as const } },
 }
 const stagger = (delay = 0.1) => ({
   hidden: {},
@@ -28,7 +29,7 @@ const stagger = (delay = 0.1) => ({
 })
 const scaleIn = {
   hidden: { opacity: 0, scale: 0.92 },
-  show: { opacity: 1, scale: 1, transition: { duration: 0.75, ease: [0.22, 1, 0.36, 1] } },
+  show: { opacity: 1, scale: 1, transition: { duration: 0.75, ease: [0.22, 1, 0.36, 1] as const } },
 }
 const vp = { once: true, margin: '-80px' }
 
@@ -74,6 +75,7 @@ const projects: Project[] = [
 
 function ProjectModal({ project, onClose }: { project: Project; onClose: () => void }) {
   const [activeImg, setActiveImg] = useState(0)
+  const isMobile = useIsMobile()
 
   useEffect(() => {
     document.body.style.overflow = 'hidden'
@@ -90,7 +92,7 @@ function ProjectModal({ project, onClose }: { project: Project; onClose: () => v
       initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
       transition={{ duration: 0.25 }}
       onClick={onClose}
-      style={{ position: 'fixed', inset: 0, zIndex: 9000, background: 'rgba(0,0,0,0.80)', backdropFilter: 'blur(14px)', WebkitBackdropFilter: 'blur(14px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}
+      style={{ position: 'fixed', inset: 0, zIndex: 9000, background: 'rgba(0,0,0,0.80)', backdropFilter: 'blur(14px)', WebkitBackdropFilter: 'blur(14px)', display: 'flex', alignItems: isMobile ? 'flex-end' : 'center', justifyContent: 'center', padding: isMobile ? 0 : 24 }}
     >
       <motion.div
         initial={{ opacity: 0, scale: 0.88, y: 32 }}
@@ -98,12 +100,23 @@ function ProjectModal({ project, onClose }: { project: Project; onClose: () => v
         exit={{ opacity: 0, scale: 0.92, y: 16 }}
         transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
         onClick={e => e.stopPropagation()}
-        style={{ background: '#161616', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 24, overflow: 'hidden', maxWidth: 960, width: '100%', height: 'min(620px, 90vh)', display: 'grid', gridTemplateColumns: '1.1fr 1fr' }}
+        style={{
+          background: '#161616',
+          border: '1px solid rgba(255,255,255,0.1)',
+          borderRadius: isMobile ? '24px 24px 0 0' : 24,
+          overflow: 'hidden',
+          maxWidth: isMobile ? '100%' : 960,
+          width: '100%',
+          height: isMobile ? '93vh' : 'min(620px, 90vh)',
+          display: isMobile ? 'flex' : 'grid',
+          flexDirection: isMobile ? 'column' : undefined,
+          ...(isMobile ? {} : { gridTemplateColumns: '1.1fr 1fr' }),
+        }}
       >
-        {/* Galería — altura fija, imagen se acomoda dentro */}
-        <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
-          {/* Imagen principal — ocupa todo el espacio restante */}
-          <div style={{ position: 'relative', flex: 1, minHeight: 0, overflow: 'hidden' }}>
+        {/* Galería */}
+        <div style={{ display: 'flex', flexDirection: 'column', height: isMobile ? 'auto' : '100%', overflow: 'hidden', flexShrink: isMobile ? 0 : undefined }}>
+          {/* Imagen principal */}
+          <div style={{ position: 'relative', flex: isMobile ? undefined : 1, height: isMobile ? 220 : undefined, minHeight: 0, overflow: 'hidden' }}>
             <AnimatePresence mode="wait">
               <motion.img
                 key={activeImg}
@@ -118,7 +131,7 @@ function ProjectModal({ project, onClose }: { project: Project; onClose: () => v
             </AnimatePresence>
             <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.55) 0%, transparent 40%)' }} />
           </div>
-          {/* Miniaturas — altura fija, no afectan el layout */}
+          {/* Miniaturas */}
           <div style={{ flexShrink: 0, display: 'flex', gap: 8, padding: '10px 12px', background: '#0f0f0f' }}>
             {project.images.map((img, i) => (
               <motion.button
@@ -135,10 +148,10 @@ function ProjectModal({ project, onClose }: { project: Project; onClose: () => v
         </div>
 
         {/* Información */}
-        <div style={{ padding: '36px 32px', overflowY: 'auto', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ padding: isMobile ? '20px 20px 28px' : '36px 32px', overflowY: 'auto', display: 'flex', flexDirection: 'column', flex: 1 }}>
           <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', color: accent, marginBottom: 10 }}>/ PROYECTO RESIDENCIAL</p>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
-            <h2 style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: 'clamp(36px, 4vw, 52px)', letterSpacing: '0.03em', color: '#fff', lineHeight: 1 }}>{project.name.toUpperCase()}</h2>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: isMobile ? 16 : 24 }}>
+            <h2 style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: isMobile ? 32 : 'clamp(36px, 4vw, 52px)', letterSpacing: '0.03em', color: '#fff', lineHeight: 1 }}>{project.name.toUpperCase()}</h2>
             <motion.button
               whileHover={{ scale: 1.1, background: 'rgba(255,255,255,0.12)' }}
               whileTap={{ scale: 0.94 }}
@@ -148,7 +161,7 @@ function ProjectModal({ project, onClose }: { project: Project; onClose: () => v
           </div>
 
           {/* Stats */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16, marginBottom: 28, paddingBottom: 28, borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12, marginBottom: isMobile ? 16 : 28, paddingBottom: isMobile ? 16 : 28, borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
             {[
               { label: 'Ubicación', value: project.location },
               { label: 'Año', value: project.year },
@@ -161,7 +174,7 @@ function ProjectModal({ project, onClose }: { project: Project; onClose: () => v
             ))}
           </div>
 
-          <p style={{ fontSize: 14, color: grayLight, lineHeight: 1.85, marginBottom: 28 }}>{project.desc}</p>
+          <p style={{ fontSize: 14, color: grayLight, lineHeight: 1.85, marginBottom: isMobile ? 16 : 28 }}>{project.desc}</p>
 
           {/* Tags */}
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 'auto' }}>
@@ -171,7 +184,7 @@ function ProjectModal({ project, onClose }: { project: Project; onClose: () => v
           </div>
 
           {/* CTA */}
-          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }} style={{ marginTop: 32 }}>
+          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }} style={{ marginTop: 24 }}>
             <Link
               to="/contacto"
               onClick={onClose}
@@ -189,6 +202,7 @@ function ProjectModal({ project, onClose }: { project: Project; onClose: () => v
 export default function PortafolioV2() {
   const [selected, setSelected] = useState<Project | null>(null)
   const [hovered, setHovered] = useState<string | null>(null)
+  const isMobile = useIsMobile()
 
   const heroRef = useRef<HTMLElement>(null)
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ['start start', 'end start'] })
@@ -208,7 +222,7 @@ export default function PortafolioV2() {
         <motion.div
           initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
-          style={{ position: 'relative', zIndex: 1, textAlign: 'center' }}
+          style={{ position: 'relative', zIndex: 1, textAlign: 'center', padding: '0 24px' }}
         >
           <motion.p
             initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
@@ -217,7 +231,7 @@ export default function PortafolioV2() {
           >
             Nuestro trabajo
           </motion.p>
-          <h1 style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: 'clamp(48px, 8vw, 80px)', letterSpacing: '0.05em', color: '#fff' }}>
+          <h1 style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: isMobile ? 48 : 'clamp(48px, 8vw, 80px)', letterSpacing: '0.05em', color: '#fff' }}>
             NUESTROS PROYECTOS
           </h1>
         </motion.div>
@@ -226,11 +240,11 @@ export default function PortafolioV2() {
       {/* Intro */}
       <motion.div
         variants={stagger(0.12)} initial="hidden" whileInView="show" viewport={vp}
-        style={{ padding: '72px 48px 48px', maxWidth: 1200, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 60, alignItems: 'end' }}
+        style={{ padding: isMobile ? '48px 24px 32px' : '72px 48px 48px', maxWidth: 1200, margin: '0 auto', display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? 20 : 60, alignItems: 'end' }}
       >
         <div>
           <motion.p variants={fadeUp} style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.16em', textTransform: 'uppercase', color: accent, marginBottom: 16 }}>/ RESIDENCIAL</motion.p>
-          <motion.h2 variants={fadeUp} style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: 'clamp(28px, 3.5vw, 44px)', color: '#fff', letterSpacing: '0.02em', lineHeight: 1.1 }}>
+          <motion.h2 variants={fadeUp} style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: isMobile ? 28 : 'clamp(28px, 3.5vw, 44px)', color: '#fff', letterSpacing: '0.02em', lineHeight: 1.1 }}>
             TRES PROYECTOS. TRES FILOSOFÍAS. UN MISMO COMPROMISO.
           </motion.h2>
         </div>
@@ -240,46 +254,48 @@ export default function PortafolioV2() {
       </motion.div>
 
       {/* Grid */}
-      <section style={{ padding: '0 48px 120px', maxWidth: 1200, margin: '0 auto' }}>
+      <section style={{ padding: isMobile ? '0 24px 80px' : '0 48px 120px', maxWidth: 1200, margin: '0 auto' }}>
         <motion.div
           variants={stagger(0.12)} initial="hidden" whileInView="show" viewport={vp}
-          style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24 }}
+          style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: 24 }}
         >
           {projects.map((p) => (
             <motion.div
               key={p.name}
               variants={scaleIn}
-              whileHover={{ y: -6 }}
+              whileHover={!isMobile ? { y: -6 } : {}}
               onClick={() => setSelected(p)}
               onMouseEnter={() => setHovered(p.name)}
               onMouseLeave={() => setHovered(null)}
               style={{ position: 'relative', borderRadius: 20, overflow: 'hidden', cursor: 'pointer', display: 'flex', flexDirection: 'column' }}
             >
               {/* Imagen */}
-              <div style={{ position: 'relative', overflow: 'hidden', aspectRatio: '3/4' }}>
+              <div style={{ position: 'relative', overflow: 'hidden', aspectRatio: isMobile ? '16/10' : '3/4' }}>
                 <motion.img
                   src={p.images[0]} alt={p.name}
                   animate={{ scale: hovered === p.name ? 1.07 : 1 }}
                   transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
                   style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
                 />
-                {/* Overlay */}
-                <motion.div
-                  animate={{ opacity: hovered === p.name ? 1 : 0 }}
-                  transition={{ duration: 0.3 }}
-                  style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.45)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                >
+                {/* Hover overlay — desktop only */}
+                {!isMobile && (
                   <motion.div
-                    initial={{ scale: 0.8, opacity: 0 }}
-                    animate={{ scale: hovered === p.name ? 1 : 0.8, opacity: hovered === p.name ? 1 : 0 }}
-                    transition={{ duration: 0.25 }}
-                    style={{ background: '#fff', borderRadius: 999, padding: '10px 24px', fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: 12, letterSpacing: '0.1em', color: '#000' }}
+                    animate={{ opacity: hovered === p.name ? 1 : 0 }}
+                    transition={{ duration: 0.3 }}
+                    style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.45)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                   >
-                    VER PROYECTO →
+                    <motion.div
+                      initial={{ scale: 0.8, opacity: 0 }}
+                      animate={{ scale: hovered === p.name ? 1 : 0.8, opacity: hovered === p.name ? 1 : 0 }}
+                      transition={{ duration: 0.25 }}
+                      style={{ background: '#fff', borderRadius: 999, padding: '10px 24px', fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: 12, letterSpacing: '0.1em', color: '#000' }}
+                    >
+                      VER PROYECTO →
+                    </motion.div>
                   </motion.div>
-                </motion.div>
+                )}
 
-                {/* Info siempre visible abajo */}
+                {/* Info overlay at bottom */}
                 <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '48px 20px 20px', background: 'linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 100%)' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
                     <div>
@@ -304,14 +320,14 @@ export default function PortafolioV2() {
       </section>
 
       {/* CTA */}
-      <section style={{ background: '#141414', padding: '100px 48px', textAlign: 'center', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+      <section style={{ background: '#141414', padding: isMobile ? '60px 24px' : '100px 48px', textAlign: 'center', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
         <motion.div variants={stagger(0.15)} initial="hidden" whileInView="show" viewport={vp}>
           <motion.p variants={fadeUp} style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.16em', textTransform: 'uppercase', color: accent, marginBottom: 20 }}>/ TU PROYECTO</motion.p>
-          <motion.h2 variants={fadeUp} style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: 'clamp(32px, 5vw, 64px)', color: '#fff', letterSpacing: '0.02em', lineHeight: 1.1, maxWidth: '20ch', margin: '0 auto 40px' }}>
+          <motion.h2 variants={fadeUp} style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: isMobile ? 32 : 'clamp(32px, 5vw, 64px)', color: '#fff', letterSpacing: '0.02em', lineHeight: 1.1, maxWidth: '20ch', margin: '0 auto 40px' }}>
             ¿QUERÉS QUE EL PRÓXIMO SEA EL TUYO?
           </motion.h2>
           <motion.div variants={fadeUp} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.97 }}>
-            <Link to="/contacto" style={{ display: 'inline-block', background: '#fff', color: '#000', fontFamily: 'Inter, sans-serif', fontWeight: 600, fontSize: 13, letterSpacing: '0.1em', padding: '16px 40px', borderRadius: 999, textDecoration: 'none' }}>
+            <Link to="/contacto" style={{ display: isMobile ? 'block' : 'inline-block', textAlign: 'center', background: '#fff', color: '#000', fontFamily: 'Inter, sans-serif', fontWeight: 600, fontSize: 13, letterSpacing: '0.1em', padding: '16px 40px', borderRadius: 999, textDecoration: 'none' }}>
               INICIAR MI PROYECTO
             </Link>
           </motion.div>
