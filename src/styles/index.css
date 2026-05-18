@@ -52,6 +52,7 @@ html {
   scroll-behavior: auto;
   -webkit-text-size-adjust: 100%;
   overflow-x: hidden;
+  background-color: #101010;
 }
 
 body {
@@ -61,10 +62,6 @@ body {
   color: var(--color-ink);
   background-color: #101010;
   overflow-x: hidden;
-}
-
-html {
-  background-color: #101010;
 }
 
 img,
