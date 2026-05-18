@@ -1,13 +1,20 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 
 const accent = '#964B00'
 
 export default function VersionSwitch() {
   const [hovered, setHovered] = useState(false)
+  const [navOpen, setNavOpen] = useState(false)
   const { pathname } = useLocation()
 
-  if (pathname === '/contacto') return null
+  useEffect(() => {
+    const handler = (e: Event) => setNavOpen((e as CustomEvent<boolean>).detail)
+    window.addEventListener('navmenuchange', handler)
+    return () => window.removeEventListener('navmenuchange', handler)
+  }, [])
+
+  if (pathname === '/contacto' || navOpen) return null
 
   return (
     <Link

@@ -1,6 +1,8 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { NavLink, Link } from 'react-router-dom'
+import { motion, AnimatePresence } from 'framer-motion'
 import logoSvg from '@/assets/logo.svg'
+import { useIsMobile } from '@/hooks/useIsMobile'
 
 const links = [
   { to: '/', label: 'Home', end: true },
@@ -9,6 +11,8 @@ const links = [
   { to: '/nosotros', label: 'Nosotros', end: false },
   { to: '/contacto', label: 'Contacto', end: false },
 ]
+
+const accent = '#964B00'
 
 const S = {
   nav: {
@@ -20,6 +24,17 @@ const S = {
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingInline: 48,
+    background: 'transparent',
+  },
+  navMobile: {
+    position: 'fixed' as const,
+    top: 0, left: 0, right: 0,
+    zIndex: 1000,
+    height: 64,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingInline: 20,
     background: 'transparent',
   },
   pill: {
@@ -68,59 +83,114 @@ const S = {
 export default function NavbarV2() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [ctaHover, setCtaHover] = useState(false)
+  const isMobile = useIsMobile()
+
+  useEffect(() => {
+    window.dispatchEvent(new CustomEvent('navmenuchange', { detail: menuOpen }))
+  }, [menuOpen])
 
   return (
     <>
-      <nav style={S.nav}>
+      <nav style={isMobile ? S.navMobile : S.nav}>
         {/* Logo */}
-        <Link to="/">
+        <Link to="/" onClick={() => setMenuOpen(false)}>
           <img src={logoSvg} alt="Tropical Lab" style={{ height: 32, width: 'auto', filter: 'brightness(0) invert(1)' }} />
         </Link>
 
-        {/* Nav pill — absolutely centered */}
-        <div style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)' }}>
-        <div style={S.pill}>
-          {links.map(l => (
-            <NavLink
-              key={l.to}
-              to={l.to}
-              end={l.end}
-              style={({ isActive }) => ({
-                ...S.linkBase,
-                ...(isActive ? S.linkActive : {}),
-              })}
+        {isMobile ? (
+          /* Hamburger */
+          <button
+            onClick={() => setMenuOpen(o => !o)}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 8, display: 'flex', flexDirection: 'column', gap: 5 }}
+            aria-label="Menú"
+          >
+            {[0, 1, 2].map(i => (
+              <motion.span key={i}
+                animate={menuOpen
+                  ? i === 0 ? { rotate: 45, y: 7 } : i === 1 ? { opacity: 0 } : { rotate: -45, y: -7 }
+                  : { rotate: 0, y: 0, opacity: 1 }}
+                transition={{ duration: 0.25 }}
+                style={{ display: 'block', width: 24, height: 2, background: '#fff', borderRadius: 2, transformOrigin: 'center' }}
+              />
+            ))}
+          </button>
+        ) : (
+          <>
+            {/* Nav pill — absolutamente centrado */}
+            <div style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)' }}>
+              <div style={S.pill}>
+                {links.map(l => (
+                  <NavLink key={l.to} to={l.to} end={l.end}
+                    style={({ isActive }) => ({ ...S.linkBase, ...(isActive ? S.linkActive : {}) })}
+                  >
+                    {l.label}
+                  </NavLink>
+                ))}
+              </div>
+            </div>
+            {/* CTA */}
+            <Link to="/contacto"
+              style={{ ...S.cta, ...(ctaHover ? { background: '#fff', color: '#000' } : {}) }}
+              onMouseEnter={() => setCtaHover(true)}
+              onMouseLeave={() => setCtaHover(false)}
             >
-              {l.label}
-            </NavLink>
-          ))}
-        </div>
-        </div>
-
-        {/* CTA */}
-        <Link
-          to="/contacto"
-          style={{ ...S.cta, ...(ctaHover ? { background: '#fff', color: '#000' } : {}) }}
-          onMouseEnter={() => setCtaHover(true)}
-          onMouseLeave={() => setCtaHover(false)}
-        >
-          Contáctenos
-        </Link>
+              Contáctenos
+            </Link>
+          </>
+        )}
       </nav>
 
-      {/* Mobile menu overlay */}
-      {menuOpen && (
-        <div style={{
-          position: 'fixed', inset: 0, zIndex: 999,
-          background: '#101010',
-          display: 'flex', flexDirection: 'column',
-          alignItems: 'center', justifyContent: 'center', gap: 32,
-        }}>
-          <button onClick={() => setMenuOpen(false)} style={{ position: 'absolute', top: 20, right: 24, background: 'none', border: 'none', color: '#fff', fontSize: 28, cursor: 'pointer' }}>✕</button>
-          {links.map(l => (
-            <NavLink key={l.to} to={l.to} onClick={() => setMenuOpen(false)} style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: 48, color: '#fff', textDecoration: 'none', letterSpacing: '0.05em' }}>{l.label}</NavLink>
-          ))}
-        </div>
-      )}
+      {/* Mobile drawer */}
+      <AnimatePresence>
+        {menuOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -16 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -16 }}
+            transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+            style={{
+              position: 'fixed', inset: 0, zIndex: 999,
+              background: '#101010',
+              display: 'flex', flexDirection: 'column',
+              alignItems: 'center', justifyContent: 'center', gap: 8,
+            }}
+          >
+            {links.map((l, i) => (
+              <motion.div key={l.to}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.05 + i * 0.06, duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+              >
+                <NavLink to={l.to} end={l.end} onClick={() => setMenuOpen(false)}
+                  style={({ isActive }) => ({
+                    fontFamily: 'Bebas Neue, sans-serif',
+                    fontSize: 48,
+                    letterSpacing: '0.05em',
+                    color: isActive ? accent : '#fff',
+                    textDecoration: 'none',
+                    display: 'block',
+                    textAlign: 'center',
+                    padding: '8px 0',
+                  })}
+                >
+                  {l.label}
+                </NavLink>
+              </motion.div>
+            ))}
+
+            <motion.div
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }}
+              style={{ marginTop: 32 }}
+            >
+              <Link to="/contacto" onClick={() => setMenuOpen(false)}
+                style={{ display: 'inline-block', background: accent, color: '#fff', fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: 13, letterSpacing: '0.12em', padding: '14px 36px', borderRadius: 999, textDecoration: 'none' }}
+              >
+                CONTÁCTENOS
+              </Link>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   )
 }
