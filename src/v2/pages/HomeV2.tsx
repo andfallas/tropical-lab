@@ -1127,15 +1127,12 @@ export default function HomeV2() {
             <motion.div
               style={{ display: 'flex', gap: 12, paddingLeft: '8vw' }}
               animate={{ x: `calc(${carouselIdx} * (-84vw - 12px))` }}
-              transition={{ type: 'spring', stiffness: 300, damping: 30, restDelta: 0.5 }}
+              transition={{ type: 'tween', duration: 0.42, ease: [0.22, 1, 0.36, 1] }}
             >
               {portfolioProjects.map((p, i) => (
                 <motion.div
                   key={p.name}
-                  animate={{
-                    opacity: i === carouselIdx ? 1 : 0.4,
-                    scale: i === carouselIdx ? 1 : 0.97,
-                  }}
+                  animate={{ opacity: i === carouselIdx ? 1 : 0.4 }}
                   transition={{ duration: 0.3 }}
                   style={{
                     flexShrink: 0,
