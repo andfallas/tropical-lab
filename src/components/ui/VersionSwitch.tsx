@@ -23,7 +23,7 @@ export default function VersionSwitch() {
       onMouseLeave={() => setHovered(false)}
       style={{
         position: 'fixed',
-        bottom: 28,
+        bottom: 'calc(28px + env(safe-area-inset-bottom, 0px))',
         right: 28,
         zIndex: 99999,
         display: 'flex',
